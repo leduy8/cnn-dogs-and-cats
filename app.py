@@ -65,18 +65,39 @@ test_batches = ImageDataGenerator(preprocessing_function=tf.keras.applications.v
     directory=test_path, target_size=(224, 224), classes=['cat', 'dog'], batch_size=10, shuffle=False)
 
 # * Visualizing data
-imgs, labels = next(train_batches)
+# imgs, labels = next(train_batches)
 
 
-def plotImages(images_arr):
-    fig, axes = plt.subplots(1, 10, figsize=(20, 20))
-    axes = axes.flatten()
-    for img, ax in zip(images_arr, axes):
-        ax.imshow(img)
-        ax.axis('off')
-    plt.tight_layout()
-    plt.show()
+# def plotImages(images_arr):
+#     fig, axes = plt.subplots(1, 10, figsize=(20, 20))
+#     axes = axes.flatten()
+#     for img, ax in zip(images_arr, axes):
+#         ax.imshow(img)
+#         ax.axis('off')
+#     plt.tight_layout()
+#     plt.show()
 
 
-plotImages(imgs)
-print(labels)
+# print(labels)
+# plotImages(imgs)
+
+# * Build a CNN model
+model = Sequential([
+    Conv2D(filters=32, kernel_size=(3, 3), activation='relu',
+           padding='same', input_shape=(224, 224, 3)),
+    MaxPool2D(pool_size=(2, 2), strides=2),
+    Conv2D(filters=64, kernel_size=(3, 3), activation='relu', padding='same'),
+    MaxPool2D(pool_size=(2, 2), strides=2),
+    Flatten(),
+    Dense(units=2, activation='softmax')
+])
+
+# model.summary()
+
+model.compile(optimizer=Adam(learning_rate=0.0001),
+              loss='categorical_crossentropy', metrics=['accuracy'])
+
+# * Train CNN model
+# ? steps_per_epoch = num of dataset / batch_size should be equal to 100. But we specify batch size of train_batches is 10 so it's equal to 100, same as the steps_per_epoch so we only need to use len() for more general (note that this is a coincidence, if not, then we set as specific number)
+model.fit(x=train_batches, steps_per_epoch=len(train_batches),
+          validation_data=valid_batches, validation_steps=len(valid_batches), epochs=10, verbose=2)
