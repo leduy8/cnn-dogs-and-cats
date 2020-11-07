@@ -17,12 +17,14 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # * Disable GPU for tensorflow
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 # * Using GPU for processing
 # physical_devices = tf.config.experimental.list_physical_devices("GPU")
 # #print("Num GPUs Available: ", len(physical_devices))
 # tf.config.experimental.set_memory_growth(physical_devices[0], True)
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # * Pickup images of dogs and cats and put it in the corresponding folders
 # os.chdir("data/dogs-vs-cats")
@@ -105,7 +107,7 @@ model.fit(x=train_batches, steps_per_epoch=len(train_batches),
 # * Extract batch of images and their corresponding labels
 test_imgs, test_labels = next(test_batches)
 
-plotImages(test_imgs)
+# plotImages(test_imgs)
 print(test_labels)
 
 # ? Get corresponding labels for test dataset
@@ -118,7 +120,7 @@ np.round(predictions)
 
 # * Create a confusion matrix
 cm = confusion_matrix(y_true=test_batches.classes,
-                      y_pred=np.argmax(perdictions, axis=-1))
+                      y_pred=np.argmax(predictions, axis=-1))
 
 
 def plot_confusion_matrix(cm, classes,
