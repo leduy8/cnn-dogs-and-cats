@@ -1,3 +1,4 @@
+from pathlib import Path
 from plotImages import plotImages
 from plot_confusion_matrix import plot_confusion_matrix
 from get_batches import get_train_batches, get_valid_batches, get_test_batches
@@ -19,6 +20,8 @@ import glob
 import matplotlib.pyplot as plt
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+Path("./models").mkdir(parents=True, exist_ok=True)
 
 # * Disable GPU for tensorflow
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
@@ -60,9 +63,15 @@ model.compile(optimizer=Adam(learning_rate=0.0001),
 model.fit(x=train_batches, steps_per_epoch=len(train_batches),
           validation_data=valid_batches, validation_steps=len(valid_batches), epochs=5, verbose=2)
 
-predictions = model.predict(x=test_batches, steps=len(test_batches), verbose=0)
+# * Save model(the architecture, the weights, the optimizer, the state of the optimizer, the learning rate, the loss, etc.) to a .h5 file
+# ? If found a model, delete it and save a new one
+if os.path.isfile("models/fine-tune_dogs_vs_cats.h5") is True:
+    os.remove("models/fine-tune_dogs_vs_cats.h5")
+model.save(r"models/fine-tune_dogs_vs_cats.h5")
 
-cm = confusion_matrix(y_true=test_batches.classes,
-                      y_pred=np.argmax(predictions, axis=-1))
-cm_plot_lables = ['cat', 'dog']
-plot_confusion_matrix(cm=cm, classes=cm_plot_labels, title='Confusion matrix')
+# predictions = model.predict(x=test_batches, steps=len(test_batches), verbose=0)
+
+# cm = confusion_matrix(y_true=test_batches.classes,
+#                       y_pred=np.argmax(predictions, axis=-1))
+# cm_plot_lables = ['cat', 'dog']
+# plot_confusion_matrix(cm=cm, classes=cm_plot_labels, title='Confusion matrix')
